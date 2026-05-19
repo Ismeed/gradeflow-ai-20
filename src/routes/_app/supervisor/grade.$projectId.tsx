@@ -45,7 +45,8 @@ function GradePage() {
   });
 
   useEffect(() => {
-    const g = project?.grades && (project.grades as any[])[0];
+    const gs = project?.grades as unknown as any[] | null;
+    const g = gs && gs[0];
     if (g) {
       setScores(Object.fromEntries(CRITERIA.map((c) => [c.key, g[`${c.key}_score`] ?? 0])) as Scores);
       setRemarks(Object.fromEntries(CRITERIA.map((c) => [c.key, g[`${c.key}_remarks`] ?? ""])) as Remarks);
