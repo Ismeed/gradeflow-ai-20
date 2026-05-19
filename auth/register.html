@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Registration — GradeFlow Platform</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <style>
+    .auth-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: linear-gradient(135deg, rgba(30, 58, 138, 0.05), rgba(16, 185, 129, 0.03)), var(--bg-app);
+    }
+    .auth-card {
+      width: 100%;
+      max-width: 480px;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px 32px;
+      box-shadow: var(--shadow-lg);
+    }
+    .auth-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .auth-logo {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 24px;
+      color: #ffffff;
+      margin: 0 auto 16px;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+    }
+    .error-msg {
+      background-color: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 20px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-logo">GF</div>
+        <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">Create Account</h2>
+        <p style="color: var(--text-secondary); font-size: 14px;">Online Student Project Registration Portal</p>
+      </div>
+
+      <!-- Error Box -->
+      <div class="error-msg" id="error-box"></div>
+
+      <!-- Register Form -->
+      <form id="register-form">
+        <div class="form-group">
+          <label class="form-label" for="fullname">Full Name</label>
+          <input type="text" id="fullname" class="form-control" placeholder="e.g. John Doe" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="regno">Registration / Matric Number</label>
+          <input type="text" id="regno" class="form-control" placeholder="FUD/CS/22/1054" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="department">Department</label>
+          <select id="department" class="form-control" required>
+            <option value="">Select Department</option>
+            <option value="Computer Science">Computer Science</option>
+            <option value="Software Engineering">Software Engineering</option>
+            <option value="Information Technology">Information Technology</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">Institutional Email</label>
+          <input type="email" id="email" class="form-control" placeholder="username@fudmas.edu.ng" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; height: 46px; margin-top: 12px;">
+          <span>Register & Login</span>
+        </button>
+      </form>
+
+      <!-- Register Footer -->
+      <div style="text-align: center; margin-top: 24px; font-size: 13px; color: var(--text-muted);">
+        Already have an account? <a href="/auth/login.html" class="auth-link">Sign In</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/data.js"></script>
+  <script src="/js/app.js"></script>
+  <script>
+    document.getElementById("register-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById("fullname").value;
+      const email = document.getElementById("email").value;
+      const regno = document.getElementById("regno").value;
+      const dept = document.getElementById("department").value;
+      const errorBox = document.getElementById("error-box");
+      
+      errorBox.style.display = "none";
+
+      const res = GFApp.registerStudent(name, email, regno, dept);
+      
+      if (res.success) {
+        window.location.href = "/student/dashboard.html";
+      } else {
+        errorBox.textContent = res.message;
+        errorBox.style.display = "block";
+      }
+    });
+  </script>
+</body>
+</html>

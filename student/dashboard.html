@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard — GradeFlow System</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <style>
+    .submission-empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      background-color: var(--bg-app);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Sidebar Container -->
+    <aside class="sidebar" id="sidebar-container"></aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Bar Container -->
+      <header class="top-bar" id="topbar-container"></header>
+
+      <!-- Content Wrapper -->
+      <div class="content-wrapper">
+        
+        <!-- Welcome banner -->
+        <div class="card" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; padding: 32px;">
+          <h1 style="font-size: 28px; font-weight: 700; margin-bottom: 8px;" id="welcome-message">Welcome back!</h1>
+          <p style="opacity: 0.85; font-size: 15px; max-width: 600px;">Track your project submission milestones, download finalized grade scorecards, and view detailed supervisor annotations.</p>
+        </div>
+
+        <!-- Student Quick Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-label">Submission Status</span>
+              <span class="stat-value" id="stat-status" style="font-size: 20px;">No Submission</span>
+            </div>
+            <div class="stat-icon-wrapper" id="status-icon-box">
+              <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-label">Evaluation Score</span>
+              <span class="stat-value" id="stat-score">--</span>
+            </div>
+            <div class="stat-icon-wrapper">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-label">Final Grade</span>
+              <span class="stat-value" id="stat-grade">--</span>
+            </div>
+            <div class="stat-icon-wrapper" style="color: var(--secondary);">
+              <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submission Status & Details -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">My Project Submission</h3>
+            <div id="submission-header-action"></div>
+          </div>
+          
+          <div id="submission-card-content">
+            <!-- Dynamic project info will be loaded here -->
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/data.js"></script>
+  <script src="/js/app.js"></script>
+  <script>
+    // Guard page access
+    if (GFApp.guardPage(["student"])) {
+      GFApp.injectSidebar("dashboard");
+      GFApp.injectTopbar("Student Dashboard");
+      
+      const user = GFApp.getCurrentUser();
+      document.getElementById("welcome-message").textContent = `Welcome back, ${user.name}!`;
+
+      // Load student's project
+      const projects = GFDb.getProjects();
+      const project = projects.find(p => p.studentId === user.id);
+
+      const statusVal = document.getElementById("stat-status");
+      const scoreVal = document.getElementById("stat-score");
+      const gradeVal = document.getElementById("stat-grade");
+      const cardContent = document.getElementById("submission-card-content");
+      const headerAction = document.getElementById("submission-header-action");
+
+      if (project) {
+        // Find if graded
+        const grades = GFDb.getGrades();
+        const grade = grades.find(g => g.projectId === project.id);
+
+        statusVal.textContent = project.status;
+        statusVal.className = "stat-value";
+        
+        // Add specific color styles for values
+        if (project.status === "graded") {
+          statusVal.style.color = "var(--success)";
+          document.getElementById("status-icon-box").style.color = "var(--success)";
+        } else if (project.status === "pending") {
+          statusVal.style.color = "var(--accent)";
+          document.getElementById("status-icon-box").style.color = "var(--accent)";
+        } else {
+          statusVal.style.color = "var(--danger)";
+          document.getElementById("status-icon-box").style.color = "var(--danger)";
+        }
+
+        if (grade) {
+          scoreVal.textContent = `${grade.totalScore} / 100`;
+          gradeVal.textContent = grade.grade;
+        }
+
+        cardContent.innerHTML = `
+          <div class="grid-2" style="margin-bottom: 24px;">
+            <div>
+              <div style="font-size: 13px; color: var(--text-muted); font-weight:600; text-transform:uppercase; margin-bottom: 4px;">Project Title</div>
+              <h4 style="font-size: 18px; font-weight:700; margin-bottom: 16px; color: var(--primary);">${project.projectTitle}</h4>
+              
+              <div style="font-size: 13px; color: var(--text-muted); font-weight:600; text-transform:uppercase; margin-bottom: 4px;">Supervisor</div>
+              <div style="font-weight: 600; margin-bottom: 16px;">${project.supervisorName}</div>
+              
+              <div style="font-size: 13px; color: var(--text-muted); font-weight:600; text-transform:uppercase; margin-bottom: 4px;">Submitted On</div>
+              <div>${project.submissionDate}</div>
+            </div>
+            <div>
+              <div style="font-size: 13px; color: var(--text-muted); font-weight:600; text-transform:uppercase; margin-bottom: 4px;">Structured Abstract</div>
+              <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6; text-align: justify;">${project.abstract}</p>
+            </div>
+          </div>
+          
+          <div style="display: flex; gap: 12px; border-top: 1px solid var(--border); padding-top: 20px;">
+            <a href="#" class="btn btn-secondary" onclick="alert('Download started for: ' + '${project.fileName}')">
+              <svg style="width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:2;" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              <span>Download Submitted Script</span>
+            </a>
+            ${grade ? `
+              <a href="/student/results.html" class="btn btn-primary">
+                <svg style="width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:2;" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                <span>View Evaluation Scorecard</span>
+              </a>
+            ` : ''}
+          </div>
+        `;
+      } else {
+        cardContent.innerHTML = `
+          <div class="submission-empty-state">
+            <svg style="width: 48px; height:48px; color: var(--text-muted); margin-bottom: 16px;" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            <h4 style="font-weight:700; margin-bottom: 8px;">No Project Submission Found</h4>
+            <p style="color: var(--text-secondary); font-size:14px; margin-bottom: 24px; max-width:400px; margin-left:auto; margin-right:auto;">You have not uploaded your research project script for assessment yet. You can submit it now.</p>
+            <a href="/student/submit.html" class="btn btn-primary">
+              <span>Submit Project Document</span>
+            </a>
+          </div>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>

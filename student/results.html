@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Academic Scorecard — GradeFlow System</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <style>
+    .result-sheet-container {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+    
+    .scorecard-header-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100px;
+      height: 100px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+      color: white;
+      font-family: var(--font-display);
+      font-size: 48px;
+      font-weight: 800;
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.25);
+    }
+
+    .report-card-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 32px;
+    }
+
+    @media (max-width: 768px) {
+      .report-card-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .progress-bar-container {
+      height: 8px;
+      background-color: var(--bg-app);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(to right, var(--primary-light), var(--secondary));
+      border-radius: 4px;
+    }
+
+    .criteria-score-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Sidebar Container -->
+    <aside class="sidebar" id="sidebar-container"></aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Bar Container -->
+      <header class="top-bar" id="topbar-container"></header>
+
+      <!-- Content Wrapper -->
+      <div class="content-wrapper">
+        
+        <div class="result-sheet-container" id="scorecard-wrapper">
+          <!-- Dynamically populated or empty state -->
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/data.js"></script>
+  <script src="/js/app.js"></script>
+  <script>
+    if (GFApp.guardPage(["student"])) {
+      GFApp.injectSidebar("results");
+      GFApp.injectTopbar("Academic Report Card");
+
+      const user = GFApp.getCurrentUser();
+      const project = GFDb.getProjects().find(p => p.studentId === user.id);
+      const wrapper = document.getElementById("scorecard-wrapper");
+
+      if (project && project.status === "graded") {
+        const grade = GFDb.getGrades().find(g => g.projectId === project.id);
+        
+        if (grade) {
+          // Render full report card
+          wrapper.innerHTML = `
+            <!-- Top Summary Card -->
+            <div class="card" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px; padding: 32px;">
+              <div style="display: flex; gap: 24px; align-items: center; flex-wrap: wrap;">
+                <div class="scorecard-header-badge">${grade.grade}</div>
+                <div>
+                  <h2 style="font-size: 24px; font-weight:700; margin-bottom: 8px;">Final Evaluation Scorecard</h2>
+                  <p style="color: var(--text-secondary); font-size:14px; font-weight: 500;">
+                    Project Title: <strong style="color: var(--primary);">${project.projectTitle}</strong>
+                  </p>
+                  <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">
+                    Assessed by: <strong>${project.supervisorName}</strong> on ${grade.gradedAt}
+                  </p>
+                </div>
+              </div>
+              <div>
+                <button class="btn btn-primary" onclick="window.print()">
+                  <svg style="width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:2;" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                  <span>Download Report Sheet</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Two Column Layout -->
+            <div class="report-card-grid">
+              <!-- Score breakdown -->
+              <div class="card">
+                <h3 class="card-title" style="margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">Criteria Evaluation Details</h3>
+                
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                  <!-- Problem Definition -->
+                  <div>
+                    <div class="criteria-score-row">
+                      <span>1. Problem Definition</span>
+                      <span style="color: var(--primary-light);">${grade.scores.problemDefinition} / 10</span>
+                    </div>
+                    <div class="progress-bar-container">
+                      <div class="progress-bar-fill" style="width: ${(grade.scores.problemDefinition / 10 * 100)}%;"></div>
+                    </div>
+                  </div>
+
+                  <!-- Literature Review -->
+                  <div>
+                    <div class="criteria-score-row">
+                      <span>2. Literature Review</span>
+                      <span style="color: var(--primary-light);">${grade.scores.literatureReview} / 15</span>
+                    </div>
+                    <div class="progress-bar-container">
+                      <div class="progress-bar-fill" style="width: ${(grade.scores.literatureReview / 15 * 100)}%;"></div>
+                    </div>
+                  </div>
+
+                  <!-- Methodology -->
+                  <div>
+                    <div class="criteria-score-row">
+                      <span>3. Methodology</span>
+                      <span style="color: var(--primary-light);">${grade.scores.methodology} / 20</span>
+                    </div>
+                    <div class="progress-bar-container">
+                      <div class="progress-bar-fill" style="width: ${(grade.scores.methodology / 20 * 100)}%;"></div>
+                    </div>
+                  </div>
+
+                  <!-- System Design -->
+                  <div>
+                    <div class="criteria-score-row">
+                      <span>4. System Design</span>
+                      <span style="color: var(--primary-light);">${grade.scores.systemDesign} / 15</span>
+                    </div>
+                    <div class="progress-bar-container">
+                      <div class="progress-bar-fill" style="width: ${(grade.scores.systemDesign / 15 * 100)}%;"></div>
+                    </div>
+                  </div>
+
+                  <!-- Implementation -->
+                  <div>
+                    <div class="criteria-score-row">
+                      <span>5. Implementation</span>
+                      <span style="color: var(--primary-light);">${grade.scores.implementation} / 20</span>
+                    </div>
+                    <div class="progress-bar-container">
+                      <div class="progress-bar-fill" style="width: ${(grade.scores.implementation / 20 * 100)}%;"></div>
+                    </div>
+                  </div>
+
+                  <!-- Documentation -->
+                  <div>
+                    <div class="criteria-score-row">
+                      <span>6. Documentation</span>
+                      <span style="color: var(--primary-light);">${grade.scores.documentation} / 10</span>
+                    </div>
+                    <div class="progress-bar-container">
+                      <div class="progress-bar-fill" style="width: ${(grade.scores.documentation / 10 * 100)}%;"></div>
+                    </div>
+                  </div>
+
+                  <!-- Presentation -->
+                  <div>
+                    <div class="criteria-score-row">
+                      <span>7. Presentation</span>
+                      <span style="color: var(--primary-light);">${grade.scores.presentation} / 10</span>
+                    </div>
+                    <div class="progress-bar-container">
+                      <div class="progress-bar-fill" style="width: ${(grade.scores.presentation / 10 * 100)}%;"></div>
+                    </div>
+                  </div>
+
+                  <!-- Total Summary row -->
+                  <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 20px; font-weight: 800; font-size: 18px; color: var(--primary);">
+                    <span>TOTAL EVALUATION SCORE</span>
+                    <span>${grade.totalScore} / 100</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Supervisor annotations -->
+              <div style="display: flex; flex-direction: column; gap: 24px;">
+                <div class="card" style="background-color: var(--bg-app);">
+                  <h3 class="card-title" style="margin-bottom: 12px;">Evaluation Status</h3>
+                  <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: var(--success); font-size: 15px;">
+                    <svg style="width:20px; height:20px;" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    <span>Approved & Archived</span>
+                  </div>
+                </div>
+
+                <div class="card">
+                  <h3 class="card-title" style="margin-bottom: 12px;">Supervisor Remarks</h3>
+                  <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6; text-align: justify; margin-bottom: 20px;">
+                    "${grade.supervisorFeedback}"
+                  </p>
+                  
+                  <h3 class="card-title" style="margin-bottom: 12px; font-size: 15px;">Recommendation</h3>
+                  <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6; text-align: justify;">
+                    ${grade.recommendation}
+                  </p>
+                </div>
+              </div>
+            </div>
+          `;
+          return;
+        }
+      }
+
+      // Empty state
+      wrapper.innerHTML = `
+        <div class="card" style="text-align: center; padding: 80px 24px;">
+          <svg style="width: 64px; height: 64px; color: var(--text-muted); margin-bottom: 20px;" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+          <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">Scorecard Not Available</h3>
+          <p style="color: var(--text-secondary); font-size: 14px; max-width: 480px; margin: 0 auto 24px;">
+            Your project submission has not been fully graded by your supervisor yet. You will receive an immediate notification as soon as your evaluation is completed.
+          </p>
+          <a href="/student/dashboard.html" class="btn btn-secondary">Go to Dashboard</a>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>

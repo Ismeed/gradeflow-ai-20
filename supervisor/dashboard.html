@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Faculty Dashboard — GradeFlow System</title>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Sidebar Container -->
+    <aside class="sidebar" id="sidebar-container"></aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Bar Container -->
+      <header class="top-bar" id="topbar-container"></header>
+
+      <!-- Content Wrapper -->
+      <div class="content-wrapper">
+        
+        <!-- Welcome Banner -->
+        <div class="card" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; padding: 32px;">
+          <h1 style="font-size: 28px; font-weight: 700; margin-bottom: 8px;" id="welcome-message">Faculty Portal</h1>
+          <p style="opacity: 0.85; font-size: 15px; max-width: 600px;">Review institutional research, award subscores across 7 strict evaluation metrics, and write constructive defense recommendations.</p>
+        </div>
+
+        <!-- Supervisor Analytics Cards -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-label">Total Assigned</span>
+              <span class="stat-value" id="sup-stat-assigned">0</span>
+            </div>
+            <div class="stat-icon-wrapper">
+              <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-label">Graded Projects</span>
+              <span class="stat-value" id="sup-stat-graded" style="color: var(--success);">0</span>
+            </div>
+            <div class="stat-icon-wrapper" style="color: var(--success);">
+              <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-label">Pending Evaluation</span>
+              <span class="stat-value" id="sup-stat-pending" style="color: var(--accent);">0</span>
+            </div>
+            <div class="stat-icon-wrapper" style="color: var(--accent);">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Assigned Projects Table -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Assigned Project Evaluations</h3>
+          </div>
+
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Student Name</th>
+                  <th>Reg Number</th>
+                  <th>Project Title</th>
+                  <th>Submitted</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="assigned-projects-body">
+                <!-- Dynamically loaded projects -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/data.js"></script>
+  <script src="/js/app.js"></script>
+  <script>
+    if (GFApp.guardPage(["supervisor"])) {
+      GFApp.injectSidebar("dashboard");
+      GFApp.injectTopbar("Faculty Dashboard");
+
+      const user = GFApp.getCurrentUser();
+      document.getElementById("welcome-message").textContent = `Faculty Portal — ${user.name}`;
+
+      // Load projects assigned to this supervisor
+      const projects = GFDb.getProjects().filter(p => p.supervisorId === user.id);
+      
+      const totalAssigned = projects.length;
+      const totalGraded = projects.filter(p => p.status === "graded").length;
+      const totalPending = projects.filter(p => p.status === "pending" || p.status === "revision").length;
+
+      document.getElementById("sup-stat-assigned").textContent = totalAssigned;
+      document.getElementById("sup-stat-graded").textContent = totalGraded;
+      document.getElementById("sup-stat-pending").textContent = totalPending;
+
+      const tbody = document.getElementById("assigned-projects-body");
+      if (projects.length > 0) {
+        tbody.innerHTML = projects.map(p => {
+          let badgeClass = "badge-pending";
+          if (p.status === "graded") badgeClass = "badge-graded";
+          if (p.status === "revision") badgeClass = "badge-revision";
+
+          return `
+            <tr>
+              <td><strong>${p.studentName}</strong></td>
+              <td><span style="font-family: monospace;">${p.regNo}</span></td>
+              <td><span style="font-size: 13px; font-weight:600; color: var(--primary);">${p.projectTitle}</span></td>
+              <td>${p.submissionDate}</td>
+              <td><span class="badge ${badgeClass}">${p.status}</span></td>
+              <td>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                  <button class="btn btn-secondary" style="padding: 6px 12px; font-size:12px;" onclick="alert('Downloading student manuscript: ${p.fileName}')">
+                    <span>Manuscript</span>
+                  </button>
+                  ${p.status !== "graded" ? `
+                    <a href="/supervisor/grade.html?id=${p.id}" class="btn btn-primary" style="padding: 6px 12px; font-size:12px;">
+                      <span>Grade Project</span>
+                    </a>
+                  ` : `
+                    <button class="btn btn-success" style="padding: 6px 12px; font-size:12px;" onclick="location.href='/supervisor/grade.html?id=${p.id}'">
+                      <span>View Score</span>
+                    </button>
+                  `}
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } else {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 48px 20px; color: var(--text-secondary);">
+              No student projects have been assigned or submitted to you yet.
+            </td>
+          </tr>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>

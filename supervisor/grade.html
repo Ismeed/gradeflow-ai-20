@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Evaluate Project Document — GradeFlow System</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <style>
+    .grading-layout {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      gap: 32px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 992px) {
+      .grading-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .live-grade-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      font-size: 36px;
+      font-weight: 800;
+      font-family: var(--font-display);
+      color: white;
+      margin-top: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .grade-a { background: linear-gradient(135deg, #10b981, #059669); }
+    .grade-b { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+    .grade-c { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .grade-d { background: linear-gradient(135deg, #eab308, #ca8a04); }
+    .grade-f { background: linear-gradient(135deg, #ef4444, #dc2626); }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Sidebar Container -->
+    <aside class="sidebar" id="sidebar-container"></aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Bar Container -->
+      <header class="top-bar" id="topbar-container"></header>
+
+      <!-- Content Wrapper -->
+      <div class="content-wrapper">
+        
+        <div class="grading-layout">
+          
+          <!-- Left: Rubric Form -->
+          <div class="card">
+            <h3 class="card-title" style="margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">Rubric Evaluation Sheet</h3>
+            
+            <form id="grading-form">
+              
+              <!-- 1. Problem Definition (10) -->
+              <div class="criteria-item">
+                <div class="criteria-header">
+                  <span class="criteria-title">1. Problem Definition & Objectives</span>
+                  <span class="criteria-score" id="val-label-pd">5 / 10</span>
+                </div>
+                <div class="score-slider-group">
+                  <input type="range" class="score-slider sync-slider" id="slide-pd" min="0" max="10" value="5" data-target="pd">
+                  <span class="slider-max">Max: 10</span>
+                </div>
+              </div>
+
+              <!-- 2. Literature Review (15) -->
+              <div class="criteria-item">
+                <div class="criteria-header">
+                  <span class="criteria-title">2. Literature Review & Scope</span>
+                  <span class="criteria-score" id="val-label-lr">8 / 15</span>
+                </div>
+                <div class="score-slider-group">
+                  <input type="range" class="score-slider sync-slider" id="slide-lr" min="0" max="15" value="8" data-target="lr">
+                  <span class="slider-max">Max: 15</span>
+                </div>
+              </div>
+
+              <!-- 3. Research Methodology (20) -->
+              <div class="criteria-item">
+                <div class="criteria-header">
+                  <span class="criteria-title">3. Research Methodology & Analysis</span>
+                  <span class="criteria-score" id="val-label-rm">10 / 20</span>
+                </div>
+                <div class="score-slider-group">
+                  <input type="range" class="score-slider sync-slider" id="slide-rm" min="0" max="20" value="10" data-target="rm">
+                  <span class="slider-max">Max: 20</span>
+                </div>
+              </div>
+
+              <!-- 4. System Design (15) -->
+              <div class="criteria-item">
+                <div class="criteria-header">
+                  <span class="criteria-title">4. System Architecture & Design</span>
+                  <span class="criteria-score" id="val-label-sd">8 / 15</span>
+                </div>
+                <div class="score-slider-group">
+                  <input type="range" class="score-slider sync-slider" id="slide-sd" min="0" max="15" value="8" data-target="sd">
+                  <span class="slider-max">Max: 15</span>
+                </div>
+              </div>
+
+              <!-- 5. System Implementation (20) -->
+              <div class="criteria-item">
+                <div class="criteria-header">
+                  <span class="criteria-title">5. Implementation, Code & Testing</span>
+                  <span class="criteria-score" id="val-label-im">10 / 20</span>
+                </div>
+                <div class="score-slider-group">
+                  <input type="range" class="score-slider sync-slider" id="slide-im" min="0" max="20" value="10" data-target="im">
+                  <span class="slider-max">Max: 20</span>
+                </div>
+              </div>
+
+              <!-- 6. Project Documentation (10) -->
+              <div class="criteria-item">
+                <div class="criteria-header">
+                  <span class="criteria-title">6. Technical Writing & Formatting</span>
+                  <span class="criteria-score" id="val-label-do">5 / 10</span>
+                </div>
+                <div class="score-slider-group">
+                  <input type="range" class="score-slider sync-slider" id="slide-do" min="0" max="10" value="5" data-target="do">
+                  <span class="slider-max">Max: 10</span>
+                </div>
+              </div>
+
+              <!-- 7. Oral Presentation (10) -->
+              <div class="criteria-item" style="margin-bottom: 28px;">
+                <div class="criteria-header">
+                  <span class="criteria-title">7. Oral Presentation & Defense Q&A</span>
+                  <span class="criteria-score" id="val-label-pr">5 / 10</span>
+                </div>
+                <div class="score-slider-group">
+                  <input type="range" class="score-slider sync-slider" id="slide-pr" min="0" max="10" value="5" data-target="pr">
+                  <span class="slider-max">Max: 10</span>
+                </div>
+              </div>
+
+            </form>
+          </div>
+
+          <!-- Right: Summary & Recommendations -->
+          <div style="display: flex; flex-direction: column; gap: 32px;">
+            
+            <!-- Student Detail Info Card -->
+            <div class="card" style="background-color: var(--bg-app);">
+              <h3 class="card-title" style="font-size: 15px; text-transform:uppercase; color:var(--text-secondary); margin-bottom:12px;">Student Under Assessment</h3>
+              <div style="font-weight: 700; font-size:18px; margin-bottom: 4px;" id="student-name-field">SARAH JENKINS</div>
+              <div style="font-family: monospace; font-size:13px; margin-bottom: 12px;" id="student-reg-field">FUD/CS/22/1004</div>
+              <div style="font-size: 13px; font-weight: 500; color: var(--text-secondary);" id="student-title-field">Project title...</div>
+            </div>
+
+            <!-- Live Grade Computations -->
+            <div class="card" style="text-align: center; padding: 32px;">
+              <h3 class="card-title" style="margin-bottom: 8px;">Total Sum & Letter Grade</h3>
+              <div style="font-size: 40px; font-weight: 800; font-family: var(--font-display); color: var(--primary);" id="total-score-display">51 / 100</div>
+              <div class="live-grade-badge grade-d" id="letter-grade-badge">D</div>
+            </div>
+
+            <!-- Decision card -->
+            <div class="card">
+              <h3 class="card-title" style="margin-bottom: 20px;">Faculty Recommendations</h3>
+              
+              <div class="form-group">
+                <label class="form-label" for="sup-feedback">Defense / Evaluation Comments</label>
+                <textarea id="sup-feedback" class="form-control" placeholder="Write constructive feedback for the student..." required></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="sup-recommendation">Formal Recommendation</label>
+                <textarea id="sup-recommendation" class="form-control" placeholder="e.g. Approved. Highly recommended for commercial publication." required></textarea>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 24px;">
+                <label class="form-label">Grading Outcome Decision</label>
+                <select id="grade-decision" class="form-control" required>
+                  <option value="approved">Approve & Release Result</option>
+                  <option value="revision">Request Revision Re-submission</option>
+                </select>
+              </div>
+
+              <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <a href="/supervisor/dashboard.html" class="btn btn-secondary">Cancel</a>
+                <button type="button" class="btn btn-primary" id="save-grade-btn">Submit Grade</button>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/data.js"></script>
+  <script src="/js/app.js"></script>
+  <script>
+    if (GFApp.guardPage(["supervisor"])) {
+      GFApp.injectSidebar("dashboard");
+      GFApp.injectTopbar("Project Evaluation & Rubric");
+
+      // Load specific project
+      const urlParams = new URLSearchParams(window.location.search);
+      const projectId = urlParams.get("id");
+      const project = GFDb.getProjects().find(p => p.id === projectId);
+
+      if (!project) {
+        alert("Project submission records not found.");
+        window.location.href = "/supervisor/dashboard.html";
+      }
+
+      // Fill in metadata card
+      document.getElementById("student-name-field").textContent = project.studentName;
+      document.getElementById("student-reg-field").textContent = project.regNo;
+      document.getElementById("student-title-field").textContent = `Title: ${project.projectTitle}`;
+
+      // Check if project was already graded (pre-fill)
+      const existingGrade = GFDb.getGrades().find(g => g.projectId === projectId);
+      if (existingGrade) {
+        document.getElementById("slide-pd").value = existingGrade.scores.problemDefinition;
+        document.getElementById("slide-lr").value = existingGrade.scores.literatureReview;
+        document.getElementById("slide-rm").value = existingGrade.scores.methodology;
+        document.getElementById("slide-sd").value = existingGrade.scores.systemDesign;
+        document.getElementById("slide-im").value = existingGrade.scores.implementation;
+        document.getElementById("slide-do").value = existingGrade.scores.documentation;
+        document.getElementById("slide-pr").value = existingGrade.scores.presentation;
+        document.getElementById("sup-feedback").value = existingGrade.supervisorFeedback;
+        document.getElementById("sup-recommendation").value = existingGrade.recommendation;
+        document.getElementById("grade-decision").value = project.status === "graded" ? "approved" : "revision";
+      }
+
+      // Setup sliders reactive listener
+      const sliders = document.querySelectorAll(".sync-slider");
+      
+      function computeTotal() {
+        let pd = parseInt(document.getElementById("slide-pd").value);
+        let lr = parseInt(document.getElementById("slide-lr").value);
+        let rm = parseInt(document.getElementById("slide-rm").value);
+        let sd = parseInt(document.getElementById("slide-sd").value);
+        let im = parseInt(document.getElementById("slide-im").value);
+        let doScore = parseInt(document.getElementById("slide-do").value);
+        let pr = parseInt(document.getElementById("slide-pr").value);
+
+        // Update labels
+        document.getElementById("val-label-pd").textContent = `${pd} / 10`;
+        document.getElementById("val-label-lr").textContent = `${lr} / 15`;
+        document.getElementById("val-label-rm").textContent = `${rm} / 20`;
+        document.getElementById("val-label-sd").textContent = `${sd} / 15`;
+        document.getElementById("val-label-im").textContent = `${im} / 20`;
+        document.getElementById("val-label-do").textContent = `${doScore} / 10`;
+        document.getElementById("val-label-pr").textContent = `${pr} / 10`;
+
+        const total = pd + lr + rm + sd + im + doScore + pr;
+        document.getElementById("total-score-display").textContent = `${total} / 100`;
+
+        // Letter grade compute
+        let gradeLetter = "F";
+        let badgeClass = "grade-f";
+
+        if (total >= 80) { gradeLetter = "A"; badgeClass = "grade-a"; }
+        else if (total >= 70) { gradeLetter = "B"; badgeClass = "grade-b"; }
+        else if (total >= 60) { gradeLetter = "C"; badgeClass = "grade-c"; }
+        else if (total >= 50) { gradeLetter = "D"; badgeClass = "grade-d"; }
+
+        const badge = document.getElementById("letter-grade-badge");
+        badge.textContent = gradeLetter;
+        badge.className = `live-grade-badge ${badgeClass}`;
+
+        return { total, gradeLetter };
+      }
+
+      sliders.forEach(slide => {
+        slide.addEventListener("input", computeTotal);
+      });
+
+      // Initial compute
+      computeTotal();
+
+      // Submit grade operations
+      document.getElementById("save-grade-btn").addEventListener("click", () => {
+        const feedback = document.getElementById("sup-feedback").value;
+        const recommendation = document.getElementById("sup-recommendation").value;
+        const decision = document.getElementById("grade-decision").value;
+
+        if (!feedback || !recommendation) {
+          alert("Please fill in feedback and recommendation remarks.");
+          return;
+        }
+
+        const { total, gradeLetter } = computeTotal();
+
+        const newGrade = {
+          id: "grd-" + Date.now(),
+          projectId: project.id,
+          scores: {
+            problemDefinition: parseInt(document.getElementById("slide-pd").value),
+            literatureReview: parseInt(document.getElementById("slide-lr").value),
+            methodology: parseInt(document.getElementById("slide-rm").value),
+            systemDesign: parseInt(document.getElementById("slide-sd").value),
+            implementation: parseInt(document.getElementById("slide-im").value),
+            documentation: parseInt(document.getElementById("slide-do").value),
+            presentation: parseInt(document.getElementById("slide-pr").value)
+          },
+          totalScore: total,
+          grade: gradeLetter,
+          recommendation: recommendation,
+          supervisorFeedback: feedback,
+          gradedAt: new Date().toISOString().split('T')[0]
+        };
+
+        GFDb.addGrade(newGrade);
+        alert("Evaluation successfully submitted! The student has been instantly notified of their scorecard.");
+        window.location.href = "/supervisor/dashboard.html";
+      });
+    }
+  </script>
+</body>
+</html>
