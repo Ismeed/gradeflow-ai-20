@@ -13,9 +13,12 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppSupervisorIndexRouteImport } from './routes/_app/supervisor/index'
 import { Route as AppStudentIndexRouteImport } from './routes/_app/student/index'
+import { Route as AppSupervisorProjectsRouteImport } from './routes/_app/supervisor/projects'
 import { Route as AppStudentSubmitRouteImport } from './routes/_app/student/submit'
 import { Route as AppStudentResultsRouteImport } from './routes/_app/student/results'
+import { Route as AppSupervisorGradeProjectIdRouteImport } from './routes/_app/supervisor/grade.$projectId'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -36,9 +39,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppSupervisorIndexRoute = AppSupervisorIndexRouteImport.update({
+  id: '/supervisor/',
+  path: '/supervisor/',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppStudentIndexRoute = AppStudentIndexRouteImport.update({
   id: '/student/',
   path: '/student/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSupervisorProjectsRoute = AppSupervisorProjectsRouteImport.update({
+  id: '/supervisor/projects',
+  path: '/supervisor/projects',
   getParentRoute: () => AppRoute,
 } as any)
 const AppStudentSubmitRoute = AppStudentSubmitRouteImport.update({
@@ -51,6 +64,12 @@ const AppStudentResultsRoute = AppStudentResultsRouteImport.update({
   path: '/student/results',
   getParentRoute: () => AppRoute,
 } as any)
+const AppSupervisorGradeProjectIdRoute =
+  AppSupervisorGradeProjectIdRouteImport.update({
+    id: '/supervisor/grade/$projectId',
+    path: '/supervisor/grade/$projectId',
+    getParentRoute: () => AppRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -58,7 +77,10 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/student/results': typeof AppStudentResultsRoute
   '/student/submit': typeof AppStudentSubmitRoute
+  '/supervisor/projects': typeof AppSupervisorProjectsRoute
   '/student/': typeof AppStudentIndexRoute
+  '/supervisor/': typeof AppSupervisorIndexRoute
+  '/supervisor/grade/$projectId': typeof AppSupervisorGradeProjectIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -66,7 +88,10 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/student/results': typeof AppStudentResultsRoute
   '/student/submit': typeof AppStudentSubmitRoute
+  '/supervisor/projects': typeof AppSupervisorProjectsRoute
   '/student': typeof AppStudentIndexRoute
+  '/supervisor': typeof AppSupervisorIndexRoute
+  '/supervisor/grade/$projectId': typeof AppSupervisorGradeProjectIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -76,7 +101,10 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/_app/student/results': typeof AppStudentResultsRoute
   '/_app/student/submit': typeof AppStudentSubmitRoute
+  '/_app/supervisor/projects': typeof AppSupervisorProjectsRoute
   '/_app/student/': typeof AppStudentIndexRoute
+  '/_app/supervisor/': typeof AppSupervisorIndexRoute
+  '/_app/supervisor/grade/$projectId': typeof AppSupervisorGradeProjectIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -86,7 +114,10 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/student/results'
     | '/student/submit'
+    | '/supervisor/projects'
     | '/student/'
+    | '/supervisor/'
+    | '/supervisor/grade/$projectId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -94,7 +125,10 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/student/results'
     | '/student/submit'
+    | '/supervisor/projects'
     | '/student'
+    | '/supervisor'
+    | '/supervisor/grade/$projectId'
   id:
     | '__root__'
     | '/'
@@ -103,7 +137,10 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/_app/student/results'
     | '/_app/student/submit'
+    | '/_app/supervisor/projects'
     | '/_app/student/'
+    | '/_app/supervisor/'
+    | '/_app/supervisor/grade/$projectId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -143,11 +180,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/supervisor/': {
+      id: '/_app/supervisor/'
+      path: '/supervisor'
+      fullPath: '/supervisor/'
+      preLoaderRoute: typeof AppSupervisorIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/student/': {
       id: '/_app/student/'
       path: '/student'
       fullPath: '/student/'
       preLoaderRoute: typeof AppStudentIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/supervisor/projects': {
+      id: '/_app/supervisor/projects'
+      path: '/supervisor/projects'
+      fullPath: '/supervisor/projects'
+      preLoaderRoute: typeof AppSupervisorProjectsRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/student/submit': {
@@ -164,19 +215,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppStudentResultsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/supervisor/grade/$projectId': {
+      id: '/_app/supervisor/grade/$projectId'
+      path: '/supervisor/grade/$projectId'
+      fullPath: '/supervisor/grade/$projectId'
+      preLoaderRoute: typeof AppSupervisorGradeProjectIdRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
   AppStudentResultsRoute: typeof AppStudentResultsRoute
   AppStudentSubmitRoute: typeof AppStudentSubmitRoute
+  AppSupervisorProjectsRoute: typeof AppSupervisorProjectsRoute
   AppStudentIndexRoute: typeof AppStudentIndexRoute
+  AppSupervisorIndexRoute: typeof AppSupervisorIndexRoute
+  AppSupervisorGradeProjectIdRoute: typeof AppSupervisorGradeProjectIdRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppStudentResultsRoute: AppStudentResultsRoute,
   AppStudentSubmitRoute: AppStudentSubmitRoute,
+  AppSupervisorProjectsRoute: AppSupervisorProjectsRoute,
   AppStudentIndexRoute: AppStudentIndexRoute,
+  AppSupervisorIndexRoute: AppSupervisorIndexRoute,
+  AppSupervisorGradeProjectIdRoute: AppSupervisorGradeProjectIdRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
