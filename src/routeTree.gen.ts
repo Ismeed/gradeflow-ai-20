@@ -15,9 +15,13 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppSupervisorIndexRouteImport } from './routes/_app/supervisor/index'
 import { Route as AppStudentIndexRouteImport } from './routes/_app/student/index'
+import { Route as AppAdminIndexRouteImport } from './routes/_app/admin/index'
 import { Route as AppSupervisorProjectsRouteImport } from './routes/_app/supervisor/projects'
 import { Route as AppStudentSubmitRouteImport } from './routes/_app/student/submit'
 import { Route as AppStudentResultsRouteImport } from './routes/_app/student/results'
+import { Route as AppAdminUsersRouteImport } from './routes/_app/admin/users'
+import { Route as AppAdminProjectsRouteImport } from './routes/_app/admin/projects'
+import { Route as AppAdminAnalyticsRouteImport } from './routes/_app/admin/analytics'
 import { Route as AppSupervisorGradeProjectIdRouteImport } from './routes/_app/supervisor/grade.$projectId'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -49,6 +53,11 @@ const AppStudentIndexRoute = AppStudentIndexRouteImport.update({
   path: '/student/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAdminIndexRoute = AppAdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppSupervisorProjectsRoute = AppSupervisorProjectsRouteImport.update({
   id: '/supervisor/projects',
   path: '/supervisor/projects',
@@ -64,6 +73,21 @@ const AppStudentResultsRoute = AppStudentResultsRouteImport.update({
   path: '/student/results',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAdminUsersRoute = AppAdminUsersRouteImport.update({
+  id: '/admin/users',
+  path: '/admin/users',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminProjectsRoute = AppAdminProjectsRouteImport.update({
+  id: '/admin/projects',
+  path: '/admin/projects',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminAnalyticsRoute = AppAdminAnalyticsRouteImport.update({
+  id: '/admin/analytics',
+  path: '/admin/analytics',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppSupervisorGradeProjectIdRoute =
   AppSupervisorGradeProjectIdRouteImport.update({
     id: '/supervisor/grade/$projectId',
@@ -75,9 +99,13 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/admin/analytics': typeof AppAdminAnalyticsRoute
+  '/admin/projects': typeof AppAdminProjectsRoute
+  '/admin/users': typeof AppAdminUsersRoute
   '/student/results': typeof AppStudentResultsRoute
   '/student/submit': typeof AppStudentSubmitRoute
   '/supervisor/projects': typeof AppSupervisorProjectsRoute
+  '/admin/': typeof AppAdminIndexRoute
   '/student/': typeof AppStudentIndexRoute
   '/supervisor/': typeof AppSupervisorIndexRoute
   '/supervisor/grade/$projectId': typeof AppSupervisorGradeProjectIdRoute
@@ -86,9 +114,13 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/admin/analytics': typeof AppAdminAnalyticsRoute
+  '/admin/projects': typeof AppAdminProjectsRoute
+  '/admin/users': typeof AppAdminUsersRoute
   '/student/results': typeof AppStudentResultsRoute
   '/student/submit': typeof AppStudentSubmitRoute
   '/supervisor/projects': typeof AppSupervisorProjectsRoute
+  '/admin': typeof AppAdminIndexRoute
   '/student': typeof AppStudentIndexRoute
   '/supervisor': typeof AppSupervisorIndexRoute
   '/supervisor/grade/$projectId': typeof AppSupervisorGradeProjectIdRoute
@@ -99,9 +131,13 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_app/admin/analytics': typeof AppAdminAnalyticsRoute
+  '/_app/admin/projects': typeof AppAdminProjectsRoute
+  '/_app/admin/users': typeof AppAdminUsersRoute
   '/_app/student/results': typeof AppStudentResultsRoute
   '/_app/student/submit': typeof AppStudentSubmitRoute
   '/_app/supervisor/projects': typeof AppSupervisorProjectsRoute
+  '/_app/admin/': typeof AppAdminIndexRoute
   '/_app/student/': typeof AppStudentIndexRoute
   '/_app/supervisor/': typeof AppSupervisorIndexRoute
   '/_app/supervisor/grade/$projectId': typeof AppSupervisorGradeProjectIdRoute
@@ -112,9 +148,13 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/admin/analytics'
+    | '/admin/projects'
+    | '/admin/users'
     | '/student/results'
     | '/student/submit'
     | '/supervisor/projects'
+    | '/admin/'
     | '/student/'
     | '/supervisor/'
     | '/supervisor/grade/$projectId'
@@ -123,9 +163,13 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/admin/analytics'
+    | '/admin/projects'
+    | '/admin/users'
     | '/student/results'
     | '/student/submit'
     | '/supervisor/projects'
+    | '/admin'
     | '/student'
     | '/supervisor'
     | '/supervisor/grade/$projectId'
@@ -135,9 +179,13 @@ export interface FileRouteTypes {
     | '/_app'
     | '/auth'
     | '/reset-password'
+    | '/_app/admin/analytics'
+    | '/_app/admin/projects'
+    | '/_app/admin/users'
     | '/_app/student/results'
     | '/_app/student/submit'
     | '/_app/supervisor/projects'
+    | '/_app/admin/'
     | '/_app/student/'
     | '/_app/supervisor/'
     | '/_app/supervisor/grade/$projectId'
@@ -194,6 +242,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppStudentIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/admin/': {
+      id: '/_app/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AppAdminIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/supervisor/projects': {
       id: '/_app/supervisor/projects'
       path: '/supervisor/projects'
@@ -215,6 +270,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppStudentResultsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/admin/users': {
+      id: '/_app/admin/users'
+      path: '/admin/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AppAdminUsersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/admin/projects': {
+      id: '/_app/admin/projects'
+      path: '/admin/projects'
+      fullPath: '/admin/projects'
+      preLoaderRoute: typeof AppAdminProjectsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/admin/analytics': {
+      id: '/_app/admin/analytics'
+      path: '/admin/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AppAdminAnalyticsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/supervisor/grade/$projectId': {
       id: '/_app/supervisor/grade/$projectId'
       path: '/supervisor/grade/$projectId'
@@ -226,18 +302,26 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRouteChildren {
+  AppAdminAnalyticsRoute: typeof AppAdminAnalyticsRoute
+  AppAdminProjectsRoute: typeof AppAdminProjectsRoute
+  AppAdminUsersRoute: typeof AppAdminUsersRoute
   AppStudentResultsRoute: typeof AppStudentResultsRoute
   AppStudentSubmitRoute: typeof AppStudentSubmitRoute
   AppSupervisorProjectsRoute: typeof AppSupervisorProjectsRoute
+  AppAdminIndexRoute: typeof AppAdminIndexRoute
   AppStudentIndexRoute: typeof AppStudentIndexRoute
   AppSupervisorIndexRoute: typeof AppSupervisorIndexRoute
   AppSupervisorGradeProjectIdRoute: typeof AppSupervisorGradeProjectIdRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAdminAnalyticsRoute: AppAdminAnalyticsRoute,
+  AppAdminProjectsRoute: AppAdminProjectsRoute,
+  AppAdminUsersRoute: AppAdminUsersRoute,
   AppStudentResultsRoute: AppStudentResultsRoute,
   AppStudentSubmitRoute: AppStudentSubmitRoute,
   AppSupervisorProjectsRoute: AppSupervisorProjectsRoute,
+  AppAdminIndexRoute: AppAdminIndexRoute,
   AppStudentIndexRoute: AppStudentIndexRoute,
   AppSupervisorIndexRoute: AppSupervisorIndexRoute,
   AppSupervisorGradeProjectIdRoute: AppSupervisorGradeProjectIdRoute,
@@ -254,3 +338,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
