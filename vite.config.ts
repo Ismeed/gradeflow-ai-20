@@ -17,6 +17,6 @@ if (isVercel) {
 export default defineConfig({
   cloudflare: isVercel ? false : undefined,
   tanstackStart: {
-    server: { entry: "server" },
+    server: isVercel ? undefined : { entry: "server" },
   },
 });
